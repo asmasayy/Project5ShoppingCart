@@ -2,9 +2,6 @@ const cartModel = require("../models/cartModel")
 const orderModel = require("../models/orderModel")
 const validator = require("../utils/validator")
 const userModel = require("../models/userModel")
-const productModel = require("../models/productModel")
-
-
 
 const createOrder = async function (req, res) {
     try {
@@ -95,7 +92,7 @@ const updateOrder = async function (req, res) {
         let data = req.body
 
         if (!validator.isValidDetails(data)) {
-            return res.status(400).send({ status: false, msg: 'enter your detailsto update' })
+            return res.status(400).send({ status: false, msg: 'enter your details to update' })
         }
 
         const { orderId, status } = data

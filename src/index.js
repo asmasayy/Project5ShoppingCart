@@ -10,7 +10,7 @@ const app = express();
 const { AppConfig } = require('aws-sdk');
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer().any());
 
 mongoose.connect("mongodb+srv://redcloud:R4SnP0bzbqEqX5wq@cluster0.tshhd.mongodb.net/project-05", {    //Connecting to the Database 

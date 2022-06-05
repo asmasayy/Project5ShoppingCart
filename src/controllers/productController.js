@@ -221,6 +221,11 @@ const getproducts = async function (req, res) {
         let priceLessThan = filter.priceLessThan
         let priceSort = filter.priceSort
 
+        if(!validator.isValidDetails(filter)){
+            let allproducts=await productModel.find({ filter,isDeleted:false })
+            return res.status(200).send({ msg: "All products", data: allproducts })  
+        }
+
         if (validator.isValidValue(priceSort)) {
 
             if (!((priceSort == 1) || (priceSort == -1))) {

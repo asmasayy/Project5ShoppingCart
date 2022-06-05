@@ -36,7 +36,7 @@ const createCart = async function (req, res) {
 
         // finding cart related to user.
         const findCartOfUser = await cartModel.findOne({ userId: userId })
-
+        //if cart is not present it will create cart here
         if (!findCartOfUser) {
 
             let priceSum = findProduct.price * 1
@@ -56,16 +56,16 @@ const createCart = async function (req, res) {
             //updating price when products get added or removed
             let price = findCartOfUser.totalPrice + (1 * findProduct.price)
             let arr = findCartOfUser.items
-
+            //adding quantity as product already present
 
             for (let i = 0; i < arr.length; i++) {
                 if (arr[i].productId == productId) {
-                    arr[i].quantity += 1
+                    arr[i].quantity += 1         
                     let cartUpdate = await cartModel.findOneAndUpdate({ _id: findCartOfUser._id }, { totalPrice: price, items: arr, totalItems: arr.length }, { new: true })
                     return res.status(200).send({ status: true, message: "data updated", data: cartUpdate })
                 }
             }
-
+            // pushing new product in items array
             arr.push({ productId: productId, quantity: 1 })
             let cartUpdate = await cartModel.findOneAndUpdate({ _id: findCartOfUser._id }, { totalPrice: price, items: arr, totalItems: arr.length }, { new: true })
             return res.status(200).send({ status: true, message: "data updated", data: cartUpdate })
@@ -90,6 +90,7 @@ const updateCart = async function (req, res) {
         if (!findUser) {
             return res.status(400).send({ status: false, msg: "userId not found" })
         }
+
         let data = req.body
         const { cartId, productId, removeProduct } = data
         if (!validator.isValidDetails(data)) {
@@ -108,7 +109,7 @@ const updateCart = async function (req, res) {
 
         }
         
-        const findCart = await cartModel.findOne({ _id: cartId, isDeleted: false })
+        const findCart = await cartModel.findOne({ _id: cartId})
         if (!findCart) {
             return res.status(400).send({ status: false, msg: "cart not found or is deleted" })
 
@@ -143,12 +144,14 @@ const updateCart = async function (req, res) {
                 status: false, message: `no such product found in your cart with this id ${productId}`,
             });
         }
+        
+        //remove the product from items
 
         if (removeProduct === 0) {
 
             let totalAmount = findCart.totalPrice - (findProduct.price * findQuantity.quantity) // substract the amount of product*quantity
-
-            await cartModel.findOneAndUpdate({ _id: cartId }, { $pull: { items: { productId: productId } } }, { new: true })   //pull the product from itmes  //https://stackoverflow.com/questions/15641492/mongodb-remove-object-from-array
+            
+            await cartModel.findOneAndUpdate({ _id: cartId }, { $pull: { items: { productId: productId } } }, { new: true })     //https://stackoverflow.com/questions/15641492/mongodb-remove-object-from-array
 
             let quantity = findCart.totalItems - 1
             let data = await cartModel.findOneAndUpdate({ _id: cartId }, { $set: { totalPrice: totalAmount, totalItems: quantity } }, { new: true })   //update the cart with total items and totalprice
@@ -157,14 +160,14 @@ const updateCart = async function (req, res) {
 
         }
 
-        // decrement quantity
+        // if removeProduct==1      
         let totalAmount = findCart.totalPrice - findProduct.price
         let arr = findCart.items
 
         for (i in arr) {
             
             if (arr[i].productId.toString() == productId) {
-                arr[i].quantity = arr[i].quantity - 1
+                arr[i].quantity = arr[i].quantity - 1    // decreases quantity by 1
                 if (arr[i].quantity < 1) {
                     await cartModel.findOneAndUpdate({ _id: cartId }, { $pull: { items: { productId: productId } } }, { new: true })
                     let quantity = findCart.totalItems - 1
@@ -209,7 +212,7 @@ const getCartDetails = async function (req, res) {
             return res.status(400).send({ status: false, msg: 'no any cart exist with this id' })
         }
         if (findCart.totalitem == 0) {
-            return res.status(404).send({ status: false, msg: 'your cart is empety.' })
+            return res.status(404).send({ status: false, msg: 'your cart is empty.' })
 
         }
         return res.status(200).send({ status: true, msg: 'card Details', data: findCart })

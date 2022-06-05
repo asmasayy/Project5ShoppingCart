@@ -1,4 +1,3 @@
-const removeUploadedFiles = require('multer/lib/remove-uploaded-files');
 const aws = require("aws-sdk")
 
 aws.config.update({
@@ -14,8 +13,8 @@ let uploadFile = (file) => {
 
         var uploadParams = {
             ACL: "public-read",
-            Bucket: "classroom-training-bucket",  //HERE
-            Key: "abc/" + file.originalname, //HERE 
+            Bucket: "classroom-training-bucket",  //main folder
+            Key: "abc/" + file.originalname, //folder inside main folder where file is uploaded 
             Body: file.buffer
         }
 

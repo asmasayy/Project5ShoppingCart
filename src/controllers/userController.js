@@ -53,7 +53,8 @@ const createUser = async (req, res) => {
             return res.status(400).send({ status: false, message: "password should be between 8-15 characters and atleast 1 character should be in upppercase" })    //Regex for checking the valid password format 
         }
 
-        const salt = bcrypt.genSaltSync(10);
+        const salt = bcrypt.genSaltSync(10)
+        
 
         const encryptedPassword = bcrypt.hashSync(password, salt);     // USE HASHSYNC TO SECURE YOUR PASSWORD
 
@@ -210,6 +211,8 @@ const updateUser = async function (req, res) {
             if (!validator.isValidValue(lname)) return res.status(400).send({ status: false, message: "Please provide the last name to update" })
 
         }
+        
+
 
         if (email == "") {
             return res.status(400).send({ status: false, message: "Please provide email" })
@@ -217,8 +220,10 @@ const updateUser = async function (req, res) {
         }
         else if (email) {
             if (!validator.validateEmail(email)) return res.status(400).send({ status: false, message: "Please provide the valid Email Address" })
-
+            let checkEmail = await userModel.findOne({ email: data.email })
+        if (checkEmail) return res.status(400).send({ status: false, message: "Email already exist" })
         }
+        
 
         if (phone == "") {
             return res.status(400).send({ status: false, message: "Please provide Phone number" })
@@ -242,6 +247,8 @@ const updateUser = async function (req, res) {
 
             var encryptedPassword = bcrypt.hashSync(password, salt1);
         }
+
+        
         if (address) {
             const address = JSON.parse(data.address)  //converting the address into JSON form
 
